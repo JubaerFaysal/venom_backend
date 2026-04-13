@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CustomersModule } from './customers/customers.module';
-import { MedicinesModule } from './medicines/medicines.module';
-import { OrdersModule } from './orders/orders.module';
 import { Customer } from './customers/entities/customer.entity';
 import { Medicine } from './medicines/entities/medicine.entity';
+import { MedicinesModule } from './medicines/medicines.module';
 import { Order } from './orders/entities/order.entity';
 import { OrderItem } from './orders/entities/order_item.entity';
+import { OrdersModule } from './orders/orders.module';
 
 @Module({
   imports: [
@@ -20,8 +20,8 @@ import { OrderItem } from './orders/entities/order_item.entity';
       entities: [Customer, Medicine, Order, OrderItem],
       synchronize: true,
     }),
-    MedicinesModule,
     CustomersModule,
+    MedicinesModule,
     OrdersModule,
   ],
 })

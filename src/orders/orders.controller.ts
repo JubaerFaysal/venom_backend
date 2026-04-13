@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { CreateOrderDto, UpdateOrderItemDto, UpdateOrderDto } from './dto/order.dto';
 import { PaymentDto } from './dto/payment.dto';
 import { Order, OrderStatus } from './entities/order.entity';
@@ -9,7 +9,7 @@ export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @Post()
-  async create(@Body(new ValidationPipe()) dto: CreateOrderDto): Promise<Order> {
+  async create(@Body() dto: CreateOrderDto): Promise<Order> {
     return this.ordersService.create(dto);
   }
 
@@ -19,16 +19,8 @@ export class OrdersController {
     @Query('customerId') customerId?: number,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
-  ): Promise<{ data: Order[]; meta: { page: number; limit: number; total: number; totalPages: number } }> {
+  ) {
     return this.ordersService.findAll(status, customerId, page, limit);
-  }
-
-  @Post(':id/payment')
-  async processPayment(
-    @Param('id') orderId: number,
-    @Body(new ValidationPipe()) dto: PaymentDto,
-  ): Promise<Order> {
-    return this.ordersService.processPayment(orderId, dto);
   }
 
   @Get(':id')
@@ -36,11 +28,19 @@ export class OrdersController {
     return this.ordersService.findOne(id);
   }
 
+  @Put(':id')
+  async updateOrder(
+    @Param('id') orderId: number,
+    @Body() dto: UpdateOrderDto,
+  ): Promise<Order> {
+    return this.ordersService.updateOrder(orderId, dto);
+  }
+
   @Put(':id/items/:itemId')
   async updateOrderItem(
     @Param('id') orderId: number,
     @Param('itemId') itemId: number,
-    @Body(new ValidationPipe()) dto: UpdateOrderItemDto,
+    @Body() dto: UpdateOrderItemDto,
   ): Promise<Order> {
     return this.ordersService.updateOrderItem(orderId, itemId, dto);
   }
@@ -53,11 +53,11 @@ export class OrdersController {
     return this.ordersService.removeOrderItem(orderId, itemId);
   }
 
-  @Put(':id')
-  async updateOrder(
+  @Post(':id/payment')
+  async processPayment(
     @Param('id') orderId: number,
-    @Body(new ValidationPipe()) dto: UpdateOrderDto,
+    @Body() dto: PaymentDto,
   ): Promise<Order> {
-    return this.ordersService.updateOrder(orderId, dto);
+    return this.ordersService.processPayment(orderId, dto);
   }
 }

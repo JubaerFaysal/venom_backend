@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
-import { CreateMedicineDto, } from './dto/medicine.dto';
+import { CreateMedicineDto } from './dto/medicine.dto';
 import { UpdateMedicineDto } from './dto/update_medicine.dto';
 import { Medicine } from './entities/medicine.entity';
 import { MedicinesService } from './medicines.service';
@@ -8,23 +8,22 @@ import { MedicinesService } from './medicines.service';
 export class MedicinesController {
   constructor(private readonly medicinesService: MedicinesService) {}
 
-@Get()
-async findAll(
-  @Query('search') search?: string,
-  @Query('filter') filter?: 'all' | 'in-stock' | 'out-of-stock' | 'discount',
-  @Query('brand') brand?: string,
-  @Query('page') page = 1,
-  @Query('limit') limit = 20,
-) {
-  return this.medicinesService.findAll({
-    search,
-    filter,
-    brand,
-    page: Number(page),
-    limit: Number(limit),
-  });
-}
-
+  @Get()
+  async findAll(
+    @Query('search') search?: string,
+    @Query('filter') filter?: 'all' | 'in-stock' | 'out-of-stock' | 'discount',
+    @Query('brand') brand?: string,
+    @Query('page') page = 1,
+    @Query('limit') limit = 20,
+  ) {
+    return this.medicinesService.findAll({
+      search,
+      filter,
+      brand,
+      page: Number(page),
+      limit: Number(limit),
+    });
+  }
 
   @Get(':id')
   async findOne(@Param('id') id: number): Promise<Medicine> {

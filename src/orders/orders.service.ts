@@ -28,22 +28,22 @@ export class OrdersService {
     await this.orderRepo.save(order);
 
     let subtotal = 0;
+    const orderItems: OrderItem[] = [];
 
     for (const item of dto.items) {
       const medicine = await this.medicinesService.findOne(item.medicineId);
       if (!medicine) throw new NotFoundException(`Medicine ${item.medicineId} not found`);
 
-      // Validate stock availability
       if (medicine.stockQuantity < item.quantity) {
         throw new BadRequestException(
-          `Insufficient stock for ${medicine.name}. Available: ${medicine.stockQuantity}, Requested: ${item.quantity}`
+          `Insufficient stock for ${medicine.name}. Available: ${medicine.stockQuantity}`,
         );
       }
 
       const unitPrice = medicine.discountedPrice;
       const quantity = item.quantity;
       const discountPercent = item.discountPercent || 0;
-      
+
       const itemSubtotal = unitPrice * quantity * (1 - discountPercent / 100);
       subtotal += itemSubtotal;
 
@@ -57,8 +57,11 @@ export class OrdersService {
         subtotal: Number(itemSubtotal.toFixed(2)),
       });
 
-      await this.itemRepo.save(orderItem);
+      orderItems.push(orderItem);
     }
+
+    // Batch insert all order items at once
+    await this.itemRepo.save(orderItems);
 
     const vatAmount = subtotal * VAT_RATE;
     const totalAmount = subtotal + vatAmount;
@@ -74,6 +77,10 @@ export class OrdersService {
 
   async processPayment(orderId: number, dto: PaymentDto): Promise<Order> {
     const order = await this.findOne(orderId);
+
+    if (order.status !== OrderStatus.DRAFT) {
+      throw new BadRequestException('Can only process payment for draft orders');
+    }
 
     const totalAmount = Number(order.totalAmount);
     const paymentAmount = Number(dto.amount);
@@ -100,18 +107,13 @@ export class OrdersService {
     }
 
     const item = await this.itemRepo.findOne({ where: { id: itemId, orderId } });
-    if (!item) {
-      throw new NotFoundException(`Order item ${itemId} not found`);
-    }
+    if (!item) throw new NotFoundException(`Order item ${itemId} not found`);
 
-    // If quantity is being updated, validate stock
     if (dto.quantity && dto.quantity !== item.quantity) {
       const medicine = await this.medicinesService.findOne(item.medicineId);
       const quantityDifference = dto.quantity - item.quantity;
       if (medicine.stockQuantity < quantityDifference) {
-        throw new BadRequestException(
-          `Insufficient stock for ${medicine.name}. Available: ${medicine.stockQuantity}, Additional needed: ${quantityDifference}`
-        );
+        throw new BadRequestException(`Insufficient stock for ${medicine.name}`);
       }
     }
 
@@ -132,9 +134,7 @@ export class OrdersService {
     }
 
     const item = await this.itemRepo.findOne({ where: { id: itemId, orderId } });
-    if (!item) {
-      throw new NotFoundException(`Order item ${itemId} not found`);
-    }
+    if (!item) throw new NotFoundException(`Order item ${itemId} not found`);
 
     await this.itemRepo.remove(item);
     return this.recalculateOrderTotals(orderId);
@@ -154,8 +154,16 @@ export class OrdersService {
   }
 
   private async recalculateOrderTotals(orderId: number): Promise<Order> {
-    const order = await this.findOne(orderId);
-    
+    // Fetch order with items in one query instead of two
+    const order = await this.orderRepo.findOne({
+      where: { id: orderId },
+      relations: ['items', 'customer'],
+    });
+
+    if (!order) {
+      throw new NotFoundException(`Order ${orderId} not found`);
+    }
+
     let subtotal = 0;
     for (const item of order.items) {
       subtotal += Number(item.subtotal);
@@ -171,10 +179,15 @@ export class OrdersService {
     order.dueAmount = Number((totalAmount - discountAmount).toFixed(2));
 
     await this.orderRepo.save(order);
-    return this.findOne(orderId);
+    return order;
   }
 
-  async findAll(status?: OrderStatus, customerId?: number, page: number = 1, limit: number = 10): Promise<{ data: Order[]; meta: { page: number; limit: number; total: number; totalPages: number } }> {
+  async findAll(
+    status?: OrderStatus,
+    customerId?: number,
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<{ data: Order[]; meta: { page: number; limit: number; total: number; totalPages: number } }> {
     const query = this.orderRepo.createQueryBuilder('order');
 
     if (status) {
@@ -189,8 +202,8 @@ export class OrdersService {
     query.leftJoinAndSelect('order.customer', 'customer');
     query.orderBy('order.createdAt', 'DESC');
 
-    const total = await query.getCount();
-    const data = await query.skip((page - 1) * limit).take(limit).getMany();
+    // Get count and data in a single query
+    const [data, total] = await query.skip((page - 1) * limit).take(limit).getManyAndCount();
 
     return {
       data,

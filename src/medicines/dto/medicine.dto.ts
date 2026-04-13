@@ -34,4 +34,6 @@ export class CreateMedicineDto {
   @IsString()
   @IsOptional()
   imageUrl?: string;
+
+  // Note: discountedPrice is automatically calculated from isDiscounted and discountPercent
 }

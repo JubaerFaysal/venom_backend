@@ -11,12 +11,13 @@ export class CustomersService {
     private customerRepo: Repository<Customer>,
   ) {}
 
-  async findAll(page: number = 1, limit: number = 10): Promise<{ data: Customer[]; meta: { page: number; limit: number; total: number; totalPages: number } }> {
+  async findAll(page: number = 1, limit: number = 10) {
     const [data, total] = await this.customerRepo.findAndCount({
       order: { createdAt: 'DESC' },
       skip: (page - 1) * limit,
       take: limit,
     });
+
     return {
       data,
       meta: {
@@ -32,7 +33,18 @@ export class CustomersService {
     const search = `%${query}%`;
     return this.customerRepo
       .createQueryBuilder('customer')
-      .where('customer.name ILIKE :search OR customer.displayName ILIKE :search OR customer.phone ILIKE :search OR customer.email ILIKE :search', { search })
+      .select([
+        'customer.id',
+        'customer.name',
+        'customer.displayName',
+        'customer.phone',
+        'customer.email',
+        'customer.createdAt',
+      ])
+      .where(
+        'customer.name ILIKE :search OR customer.displayName ILIKE :search OR customer.phone ILIKE :search OR customer.email ILIKE :search',
+        { search },
+      )
       .orderBy('customer.createdAt', 'DESC')
       .getMany();
   }
@@ -51,7 +63,14 @@ export class CustomersService {
   }
 
   async update(id: number, dto: UpdateCustomerDto): Promise<Customer> {
-    await this.customerRepo.update({ id }, dto);
+    // Filter out undefined values
+    const updateData = Object.fromEntries(
+      Object.entries(dto).filter(([_, value]) => value !== undefined)
+    );
+
+    if (Object.keys(updateData).length > 0) {
+      await this.customerRepo.update({ id }, updateData);
+    }
     return this.findOne(id);
   }
 }
