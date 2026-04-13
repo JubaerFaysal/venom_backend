@@ -63,7 +63,6 @@ export class CustomersService {
   }
 
   async update(id: number, dto: UpdateCustomerDto): Promise<Customer> {
-    // Filter out undefined values
     const updateData = Object.fromEntries(
       Object.entries(dto).filter(([_, value]) => value !== undefined)
     );

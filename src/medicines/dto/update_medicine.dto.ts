@@ -40,7 +40,4 @@ export class UpdateMedicineDto {
   @IsString()
   @IsOptional()
   imageUrl?: string;
-
-  // Note: discountedPrice is a computed getter and cannot be updated directly
-  // The discountedPrice will be calculated automatically based on isDiscounted and discountPercent
 }

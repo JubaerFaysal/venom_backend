@@ -60,7 +60,6 @@ export class OrdersService {
       orderItems.push(orderItem);
     }
 
-    // Batch insert all order items at once
     await this.itemRepo.save(orderItems);
 
     const vatAmount = subtotal * VAT_RATE;
@@ -154,7 +153,6 @@ export class OrdersService {
   }
 
   private async recalculateOrderTotals(orderId: number): Promise<Order> {
-    // Fetch order with items in one query instead of two
     const order = await this.orderRepo.findOne({
       where: { id: orderId },
       relations: ['items', 'customer'],
@@ -202,7 +200,6 @@ export class OrdersService {
     query.leftJoinAndSelect('order.customer', 'customer');
     query.orderBy('order.createdAt', 'DESC');
 
-    // Get count and data in a single query
     const [data, total] = await query.skip((page - 1) * limit).take(limit).getManyAndCount();
 
     return {

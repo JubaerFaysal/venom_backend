@@ -1,98 +1,236 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Vonome Task - Pharmacy Management System
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A comprehensive REST API for managing pharmacy operations including medicines, customers, and orders built with NestJS and TypeORM.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Features
 
-## Description
+- **Medicines Management**
+  - CRUD operations for medicines
+  - Search by name, generic name, or barcode
+  - Filter by brand, stock status, and discounts
+  - Pagination support
+  - Real image URLs for medicine products
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- **Customer Management**
+  - Create and manage customer profiles
+  - Track customer information
 
-## Project setup
+- **Orders Management**
+  - Create orders with multiple medicine items
+  - Automatic VAT calculation
+  - Discount support
+  - Fetch orders with related items and customer details
+  - Order history and listing
 
-```bash
-$ npm install
-```
+- **Inventory Management**
+  - Track stock quantities
+  - Automatic stock updates on orders
+  - In-stock and out-of-stock filtering
 
-## Compile and run the project
+## Tech Stack
 
-```bash
-# development
-$ npm run start
+- **Framework**: NestJS 11.x
+- **Language**: TypeScript
+- **Database**: PostgreSQL
+- **ORM**: TypeORM
+- **Validation**: Class Validator & Class Transformer
+- **API Documentation**: REST API
 
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
-
-## Run tests
+## Installation
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npm install
 ```
 
-## Deployment
+## Environment Setup
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+Create a `.env` file in the root directory with your PostgreSQL configuration:
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+```env
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+DB_NAME=vonome_task
+PORT=3000
+```
+
+## Running the Application
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+# Development mode (with watch)
+npm run start:dev
+
+# Production mode
+npm run start:prod
+
+# Build only
+npm run build
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+The server will start on `http://localhost:3000` by default.
 
-## Resources
+## Project Structure
 
-Check out a few resources that may come in handy when working with NestJS:
+```
+src/
+├── app.module.ts                 # Root module
+├── main.ts                       # Application entry point
+├── medicines/                    # Medicines module
+│   ├── medicines.service.ts      # Business logic
+│   ├── medicines.controller.ts   # API endpoints
+│   ├── medicines.module.ts       # Module configuration
+│   ├── entities/
+│   │   └── medicine.entity.ts    # Database entity
+│   └── dto/
+│       ├── medicine.dto.ts       # Create DTO
+│       └── update_medicine.dto.ts # Update DTO
+├── customers/                    # Customers module
+│   ├── customers.service.ts
+│   ├── customers.controller.ts
+│   ├── customers.module.ts
+│   ├── entities/
+│   │   └── customer.entity.ts
+│   └── dto/
+│       └── customer.dto.ts
+└── orders/                       # Orders module
+    ├── orders.service.ts
+    ├── orders.controller.ts
+    ├── orders.module.ts
+    ├── entities/
+    │   ├── order.entity.ts
+    │   └── order_item.entity.ts
+    └── dto/
+        ├── order.dto.ts
+        └── payment.dto.ts
+```
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+## API Endpoints
 
-## Support
+### Medicines
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+- `GET /medicines` - List all medicines with pagination and filters
+- `GET /medicines/:id` - Get medicine by ID
+- `POST /medicines` - Create a new medicine
+- `PUT /medicines/:id` - Update medicine
+- `DELETE /medicines/:id` - Delete medicine
+- `POST /medicines/seed` - Seed database with sample medicines
 
-## Stay in touch
+### Customers
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+- `GET /customers` - List all customers
+- `GET /customers/:id` - Get customer by ID
+- `POST /customers` - Create a new customer
+- `PUT /customers/:id` - Update customer
+- `DELETE /customers/:id` - Delete customer
+
+### Orders
+
+- `GET /orders` - List all orders with pagination
+- `GET /orders/:id` - Get order with items by ID
+- `POST /orders` - Create a new order
+- `PUT /orders/:id` - Update order
+- `DELETE /orders/:id` - Delete order
+
+## Database Entities
+
+### Medicine
+- id (Primary Key)
+- name (String)
+- generic (String)
+- barcode (Unique String)
+- brand (String)
+- price (Decimal)
+- stockQuantity (Integer)
+- isDiscounted (Boolean)
+- discountPercent (Decimal)
+- imageUrl (String)
+- createdAt (Timestamp)
+- updatedAt (Timestamp)
+
+### Customer
+- id (Primary Key)
+- name (String)
+- email (String)
+- phone (String)
+- address (String)
+- createdAt (Timestamp)
+- updatedAt (Timestamp)
+
+### Order
+- id (Primary Key)
+- customerId (Foreign Key)
+- subtotal (Decimal)
+- discountAmount (Decimal)
+- vatAmount (Decimal)
+- totalAmount (Decimal)
+- discountPercent (Decimal)
+- status (String)
+- items (One-to-Many relationship)
+- createdAt (Timestamp)
+- updatedAt (Timestamp)
+
+### OrderItem
+- id (Primary Key)
+- orderId (Foreign Key)
+- medicineId (Foreign Key)
+- quantity (Integer)
+- unitPrice (Decimal)
+- totalPrice (Decimal)
+
+## Query Examples
+
+### Medicines
+```bash
+# Search medicines
+GET /medicines?search=paracetamol
+
+# Filter by brand
+GET /medicines?brand=Square
+
+# Filter by stock status
+GET /medicines?filter=in-stock
+
+# Filter by discount
+GET /medicines?filter=discount
+
+# Pagination
+GET /medicines?page=1&limit=10
+```
+
+### Orders
+```bash
+# List orders with pagination
+GET /orders?page=1&limit=20
+
+# Get specific order with items
+GET /orders/1
+```
+
+## Key Features Implementation
+
+### Pagination
+Medicines endpoint supports pagination with configurable page size (default: 20, max: 100).
+
+### Search & Filtering
+- Search medicines by name, generic name, or barcode
+- Filter by brand, stock status (in-stock, out-of-stock), or discount status
+
+### Automatic Calculations
+- VAT calculation at 15% on orders
+- Discounted price calculation based on discount percentage
+- Automatic stock updates when orders are created
+
+### Data Validation
+Global validation pipe ensures:
+- Whitelist validation (only defined properties)
+- Type transformation
+- DTO validation using class-validator decorators
 
 ## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+UNLICENSED
+
+## Author
+
+Jubaer Ahmed Faysal

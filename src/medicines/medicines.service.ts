@@ -77,7 +77,6 @@ export class MedicinesService {
   }
 
   async update(id: number, dto: UpdateMedicineDto): Promise<Medicine> {
-    // Filter out undefined values to only update provided fields
     const updateData = Object.fromEntries(
       Object.entries(dto).filter(([_, value]) => value !== undefined)
     );
@@ -94,72 +93,71 @@ export class MedicinesService {
       {
         name: 'Paracetamol 500mg',
         generic: 'Paracetamol',
-        barcode: '101011',
+        barcode: '8901234567890',
         brand: 'Square',
         price: 180,
         stockQuantity: 150,
         isDiscounted: true,
         discountPercent: 5,
-        imageUrl: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde0b?w=400&h=400&fit=crop',
+        imageUrl: 'https://images.pexels.com/photos/9155926/pexels-photo-9155926.jpeg',
       },
       {
         name: 'Napa 500mg',
         generic: 'Paracetamol',
-        barcode: '202021',
+        barcode: '8901234567891',
         brand: 'Beximco',
         price: 150,
         stockQuantity: 200,
         isDiscounted: false,
         discountPercent: 0,
-        imageUrl: 'https://images.unsplash.com/photo-1576091160550-112046e9d830?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+        imageUrl: 'https://images.pexels.com/photos/5752142/pexels-photo-5752142.jpeg',
       },
       {
         name: 'Ace 500mg',
         generic: 'Paracetamol',
-        barcode: '303031',
+        barcode: '8901234567892',
         brand: 'Square',
         price: 160,
         stockQuantity: 0,
         isDiscounted: false,
         discountPercent: 0,
-        imageUrl: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde0b?w=400&h=400&fit=crop',
+        imageUrl: 'https://images.pexels.com/photos/6032619/pexels-photo-6032619.jpeg',
       },
       {
         name: 'Napa Extra',
         generic: 'Paracetamol+Caffeine',
-        barcode: ' 404041',
+        barcode: '8901234567893',
         brand: 'Beximco',
         price: 220,
         stockQuantity: 100,
         isDiscounted: true,
         discountPercent: 10,
-        imageUrl: 'https://images.unsplash.com/photo-1552267299-bab91357f330?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+        imageUrl: 'https://images.pexels.com/photos/4332674/pexels-photo-4332674.jpeg',
       },
       {
         name: 'Ibuprofen 400mg',
         generic: 'Ibuprofen',
-        barcode: '505051',
+        barcode: '8901234567894',
         brand: 'Incepta',
         price: 120,
         stockQuantity: 300,
         isDiscounted: false,
         discountPercent: 0,
-        imageUrl: 'https://images.unsplash.com/photo-1631217b5f57-f4e1?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+        imageUrl: 'https://images.pexels.com/photos/7748667/pexels-photo-7748667.jpeg',
       },
       {
         name: 'Ranitidine 150mg',
         generic: 'Ranitidine',
-        barcode: '606061',
+        barcode: '8901234567895',
         brand: 'Opsonin',
         price: 90,
         stockQuantity: 250,
         isDiscounted: false,
         discountPercent: 0,
-        imageUrl: 'https://images.unsplash.com/photo-1576091160550-112046e9d830?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+        imageUrl: 'https://images.pexels.com/photos/6032627/pexels-photo-6032627.jpeg',
       },
     ];
 
-    // Get all existing barcodes in one query
     const existingBarcodes = (await this.medicineRepo
       .createQueryBuilder('medicine')
       .select('medicine.barcode')
